@@ -1,0 +1,13 @@
+Flask==1.1.2
+requests==2.23.0
+ipwhois==1.2.0
+beautifulsoup4==4.9.3
+IPy==1.01
+numpy
+pandas
+sklearn
+whois
+lxml
+matplotlib
+seaborn
+xgboost
