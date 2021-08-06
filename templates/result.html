@@ -56,7 +56,7 @@
                 </tr>
             </thead>
         <tbody>
-
+        {% if detailed %}
         {% for n in range(25) %} <!-- 1 - red, -1 - green, 0 - yellow-->
             <tr>
                 <td>{{ n+1 }}</td>
@@ -69,6 +69,7 @@
             {% endif %}
             </tr>
         {% endfor %}
+        {% endif %}
 
         </tbody>
         </table>
