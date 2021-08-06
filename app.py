@@ -1,7 +1,7 @@
 from datetime import datetime
 from urllib.parse import urlparse
 from modules.api.module import api
-from modules.ml.module import predict
+from modules.ml.model import predict
 from flask import Flask, render_template, request
 
 
@@ -31,7 +31,7 @@ def main_page():
     return render_template('main_page.html', error=error)
 
 @app.route("/res", methods=['GET', 'POST'], strict_slashes=False)
-def main_page():
+def res_page():
     # Function of UI result page route
 
     if request.method == 'POST':
@@ -46,7 +46,8 @@ def main_page():
                 if not ping_status:
                     error = 'Host down'
                 else:
-                    data = predict(url)
+                    #data = predict(url)
+                    data = []
                     render_template('result.html', data=data)
 
             else:
