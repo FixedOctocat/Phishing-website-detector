@@ -23,7 +23,7 @@ def res_page():
         try:
             url = request.form.to_dict(flat=False)['url'][0]
         except:
-            return {'error': 'specify url'}
+            error = 'Specify url'
         
         if url != '':
             check = urlparse(url)
@@ -31,12 +31,12 @@ def res_page():
             if check.scheme != '' and check.netloc != '':
                 ping_status = ping(url)
 
-                if not ping_status:
-                    error = 'Host down'
-                else:
+                if ping_status:
                     #data = predict(url)
                     data = []
-                    render_template('result.html', data=data)
+                    return render_template('result.html', data=data)
+                else:
+                    error = 'Host down'
 
             else:
                 error = 'Invalid url'
