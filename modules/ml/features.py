@@ -17,10 +17,16 @@ class Features:
     NOT_PHISHING = -1
     SUSPICIOUS = 0
 
+    THRESHOLDS = {
+        'rank': 100000,
+        'google_index': 9,
+        'external_links': 5,
+    }
+
     def __init__(self, url):
         self.url = url
         self.domain = self._get_domain()
-        self.url_response = self._get_url_response()
+        self.url_response, self.url_response_bs = self._get_url_response()
         self.whois_response = self._get_whois_response()
         self.rank_check_response = self._get_rank_check_response()
         self.global_rank = self._get_global_rank()
@@ -71,20 +77,20 @@ class Features:
         return whois.query(self.domain)
 
     def _get_rank_check_response(self):
-        return requests.post("https://www.checkpagerank.net/index.php", {
+        return requests.post("https://checkpagerank.net/check-page-rank.php", {
             "name": self.domain
         })
 
     def _get_global_rank(self):
         try:
-            return int(re.findall(r"Global Rank: ([0-9]+)", self.rank_check_response.text)[0])
+            return float(re.findall(r"Global Rank: ([0-9]+)", self.rank_check_response.text)[0])
         except:
             return -1
 
     def _get_url_response(self):
         response = requests.get(self.url)
         soup = BeautifulSoup(response.text, 'html.parser')
-        return soup
+        return response, soup
 
     def _get_ip_blacklist(self):
         with open('data/cleantalk_30d.ipset', 'r') as blacklist:
@@ -132,7 +138,7 @@ class Features:
             return self.PHISHING
 
     def _check_ssl(self):
-        return self.NOT_PHISHING if 'https' in self.url and self.url_response.text != '' else self.PHISHING
+        return self.NOT_PHISHING if 'https' in self.url and self.url_response_bs.text != '' else self.PHISHING
 
     def _check_reg_len(self):
         expiration_date = self.whois_response.expiration_date
@@ -171,43 +177,83 @@ class Features:
         return self.NOT_PHISHING
 
     def _check_for_mailing(self):
-        return self.NOT_PHISHING
+        if not self.url_response.content:
+            return self.NOT_PHISHING
+
+        return self.PHISHING if re.findall(r"[mail\(\)|mailto:?]", self.url_response_bs.text) else self.NOT_PHISHING
 
     def _check_abnormal_url(self):
         return self.NOT_PHISHING
 
     def _check_website_forwarding(self):
-        return self.NOT_PHISHING
+        if not self.url_response_bs:
+            return self.NOT_PHISHING
+
+        redirect_count = len(self.url_response.history)
+
+        if redirect_count <= 1:
+            return self.NOT_PHISHING
+        elif redirect_count > 1 and redirect_count <= 4:
+            return self.SUSPICIOUS
+        else:
+            return self.PHISHING
 
     def _check_status_bar_customization(self):
-        return self.NOT_PHISHING
+        if not self.url_response_bs:
+            return self.NOT_PHISHING
+
+        return self.PHISHING if re.findall("<script>.+onmouseover.+</script>", str(self.url_response_bs.text)) else self.NOT_PHISHING
 
     def _check_disable_right_click(self):
-        return self.NOT_PHISHING
+        if not self.url_response_bs:
+            return self.NOT_PHISHING
+
+        return self.PHISHING if re.findall(r"event.button ?== ?2", str(self.url_response_bs.text)) else self.NOT_PHISHING
 
     def _check_popup_window(self):
-        return self.NOT_PHISHING
+        if not self.url_response_bs:
+            return self.NOT_PHISHING
+
+        return self.PHISHING if re.findall(r"alert\(", str(self.url_response_bs.text)) else self.NOT_PHISHING
 
     def _check_iframe_redirection(self):
-        return self.NOT_PHISHING
+        if not self.url_response_bs:
+            return self.NOT_PHISHING
+
+        return self.PHISHING if len(self.url_response_bs.findAll('iframe')) else self.NOT_PHISHING
 
     def _check_domain_age(self):
-        return self.NOT_PHISHING
+        domain = whois.query(self.domain)
+
+        today = datetime.datetime.today()
+        created = domain.creation_date
+
+        delta = abs(today - created)
+
+        return self.NOT_PHISHING if delta.days >= 180 else self.PHISHING
 
     def _check_dns_record(self):
-        return self.NOT_PHISHING
+        dns = whois.query(self.domain)
+        return self.NOT_PHISHING if dns.last_updated is not None else self.PHISHING
 
     def _check_website_traffic(self):
-        return self.NOT_PHISHING
+        try:
+            rank = BeautifulSoup(str(requests.get("http://data.alexa.com/data?cli=10&dat=s&url=" + self.url).content),
+                                 "lxml").find('reach').attrs['rank']
+            return self.NOT_PHISHING if rank < self.THRESHOLDS['rank'] else self.SUSPICIOUS
+        except:
+            return self.PHISHING
 
     def _check_pagerank(self):
-        return self.NOT_PHISHING
+        return self.PHISHING if self.global_rank < 0.2 else self.NOT_PHISHING
 
     def _check_google_index(self):
-        return self.NOT_PHISHING
+        site = search(f'{self.url}', 10)
+        return self.NOT_PHISHING if len(site) > self.THRESHOLDS['google_index'] else self.PHISHING
 
     def _check_links_to_page(self):
-        return self.NOT_PHISHING
+        site = search(f'href="{self.url}"', 10)
+        return self.NOT_PHISHING if len(site) > self.THRESHOLDS['external_links'] else self.PHISHING
 
     def _check_statistical_report(self):
         try:
@@ -215,249 +261,3 @@ class Features:
             return self.PHISHING if ip_address in self.ip_blacklist else self.NOT_PHISHING
         except:
             return self.NOT_PHISHING
-
-    #
-    #
-    # def _check_links_pointing_to_page(self):
-    #     if not self.url_response:
-    #         return self.NOT_PHISHING
-    #
-    #     return self.NOT_PHISHING
-    #
-    #     links = re.findall(r"<a href=(.*)", str(self.url_response.contents))
-    #
-    #     number_of_links = 5
-    #
-    #     if number_of_links == 0:
-    #         return self.NOT_PHISHING
-    #     elif number_of_links <= 2:
-    #         return self.PHISHING
-    #     else:
-    #         return self.PHISHING
-    #
-    # def _check_global_rank(self):
-    #     return self.NOT_PHISHING
-    #     try:
-    #         if self.global_rank > 0 and self.global_rank < 100000:
-    #             return self.NOT_PHISHING
-    #         else:
-    #             return self.PHISHING
-    #     except:
-    #         return self.PHISHING
-    #
-    # def _check_web_traffic(self):
-    #     return self.NOT_PHISHING
-    #     try:
-    #         rank = BeautifulSoup(urllib.request.urlopen("http://data.alexa.com/data?cli=10&dat=s&url=" + url).read(), "xml").find("REACH")['RANK']
-    #         rank= int(rank)
-    #         if (rank < 100000):
-    #             return self.PHISHING
-    #         else:
-    #             return self.SUSPICIOUS
-    #     except TypeError:
-    #         return self.NOT_PHISHING
-    #
-    # def _check_popUpWidnow(self):
-    #     if response == "":
-    #         return self.NOT_PHISHING
-    #     else:
-    #         if re.findall(r"alert\(", response.text):
-    #             return self.PHISHING
-    #         else:
-    #             return self.PHISHING
-    #
-    # def _check_RightClick(self):
-    #     if self.response == "":
-    #         return self.NOT_PHISHING
-    #     else:
-    #         if re.findall(r"event.button ?== ?2", response.text):
-    #             return self.PHISHING
-    #         else:
-    #             return self.NOT_PHISHING
-    #
-    # def _check_on_mouseover(self):
-    #     if response == "" :
-    #         return self.NOT_PHISHING
-    #     else:
-    #         if re.findall("<script>.+onmouseover.+</script>", response.text):
-    #             return self.PHISHING
-    #         else:
-    #             return self.NOT_PHISHING
-    #
-    # def _check_redirect(self):
-    #     if response == "":
-    #         return self.NOT_PHISHING
-    #     else:
-    #         if len(response.history) <= 1:
-    #             return self.NOT_PHISHING
-    #         elif len(response.history) <= 4:
-    #             return self.SUSPICIOUS
-    #         else:
-    #             return self.PHISHING
-    #
-    # def _check_abnormal_URL(self):
-    #     if response == "":
-    #         return self.NOT_PHISHING
-    #     else:
-    #         if response.text == "":
-    #             return self.PHISHING
-    #         else:
-    #             return self.NOT_PHISHING
-    #
-    # def _check_email_submiting(self):
-    #     if response == "":
-    #         return self.NOT_PHISHING
-    #     else:
-    #         if re.findall(r"[mail\(\)|mailto:?]", response.text):
-    #             return self.PHISHING
-    #         else:
-    #             return self.NOT_PHISHING
-    #
-    # def _check_sfh(self):
-    #     for form in soup.find_all('form', action= True):
-    #        if form['action'] =="" or form['action'] == "about:blank" :
-    #           return self.NOT_PHISHIN
-    #        elif url not in form['action'] and domain not in form['action']:
-    #            return self.SUSPICIOUS
-    #        else:
-    #              return self.PHISHING
-    #
-    # def _checl_links_in_tags(self):
-    #     i=0
-    #     success =0
-    #     if soup == -999:
-    #         data_set.append(-1)
-    #     else:
-    #         for link in soup.find_all('link', href= True):
-    #            dots=[x.start(0) for x in re.finditer('\.',link['href'])]
-    #            if url in link['href'] or domain in link['href'] or len(dots)==1:
-    #               success = success + 1
-    #            i=i+1
-    #
-    #         for script in soup.find_all('script', src= True):
-    #            dots=[x.start(0) for x in re.finditer('\.',script['src'])]
-    #            if url in script['src'] or domain in script['src'] or len(dots)==1 :
-    #               success = success + 1
-    #            i=i+1
-    #         try:
-    #             percentage = success / float(i) * 100
-    #         except:
-    #             return self.PHISHING
-    #
-    #         if percentage < 17.0 :
-    #            return self.PHISHING
-    #         elif((percentage >= 17.0) and (percentage < 81.0)) :
-    #            return self.SUSPICIOUS
-    #         else :
-    #            return self.NOT_PHISHING
-    #
-    # def _check_anchors(self):
-    #     percentage = 0
-    #     i = 0
-    #     unsafe=0
-    #     if soup == -999:
-    #         data_set.append(-1)
-    #     else:
-    #         for a in soup.find_all('a', href=True):
-    #             if "#" in a['href'] or "javascript" in a['href'].lower() or "mailto" in a['href'].lower() or not (url in a['href'] or domain in a['href']):
-    #                 unsafe = unsafe + 1
-    #             i = i + 1
-    #
-    #
-    #         try:
-    #             percentage = unsafe / float(i) * 100
-    #         except:
-    #             return self.PHISHING
-    #
-    #         if percentage < 31.0:
-    #             return self.PHISHING
-    #         elif ((percentage >= 31.0) and (percentage < 67.0)):
-    #             return self.SUSPICIOUS
-    #         else:
-    #             return self.NOT_PHISHING
-    #
-    # def _check_request_url(self):
-    #     i = 0
-    #     success = 0
-    #     if soup == -999:
-    #         return self.NOT_PHISHING
-    #     else:
-    #         for img in soup.find_all('img', src= True):
-    #            dots= [x.start(0) for x in re.finditer('\.', img['src'])]
-    #            if url in img['src'] or domain in img['src'] or len(dots)==1:
-    #               success = success + 1
-    #            i=i+1
-    #
-    #         for audio in soup.find_all('audio', src= True):
-    #            dots = [x.start(0) for x in re.finditer('\.', audio['src'])]
-    #            if url in audio['src'] or domain in audio['src'] or len(dots)==1:
-    #               success = success + 1
-    #            i=i+1
-    #
-    #         for embed in soup.find_all('embed', src= True):
-    #            dots=[x.start(0) for x in re.finditer('\.',embed['src'])]
-    #            if url in embed['src'] or domain in embed['src'] or len(dots)==1:
-    #               success = success + 1
-    #            i=i+1
-    #
-    #         for iframe in soup.find_all('iframe', src= True):
-    #            dots=[x.start(0) for x in re.finditer('\.',iframe['src'])]
-    #            if url in iframe['src'] or domain in iframe['src'] or len(dots)==1:
-    #               success = success + 1
-    #            i=i+1
-    #
-    #         try:
-    #            percentage = success/float(i) * 100
-    #            if percentage < 22.0 :
-    #               return self.PHISHING
-    #            elif((percentage >= 22.0) and (percentage < 61.0)) :
-    #               return self.SUSPICIOUS
-    #            else :
-    #               return self.NOT_PHISHING
-    #         except:
-    #             return self.PHISHING
-    #
-    #
-    #
-    #
-    # def _check_dns_domain_age(self):
-    #     domain = whois.query(self.domain)
-    #     domain.creation_date
-    #
-    # def _check_dns_record(self):
-    #     domain = whois.query(self.domain)
-    #
-    #     domain.creation_date
-    #
-    #     dns = 1
-    #     try:
-    #         d = whois.whois(domain)
-    #     except:
-    #         dns = -1
-    #     if dns == -1:
-    #         data_set.append(-1)
-    #     else:
-    #         if registration_length / 365 <= 1:
-    #             data_set.append(-1)
-    #         else:
-    #             data_set.append(1)
-    #
-    # def _check_web_traffic(self):
-    #     rank = int(BeautifulSoup(
-    #         requests.get("http://data.alexa.com/data?cli=10&dat=s&url=" + self.url).text,
-    #         'lxml'
-    #     ).find('REACH')['RANK'])
-    #
-    #     return self.PHISHING if rank < 100000 else self.NOT_PHISHING
-    #
-    # def _check_page_rank(self):
-    #     return self.PHISHING if self.global_rank < 100000 else self.NOT_PHISHING\
-    #
-    # def _check_google_index(self):
-    #     site = search(self.url, 5)
-    #     return self.NOT_PHISHING if site else self.PHISHING
-    #
-    # # TODO
-    # def _check_links_to_page(self):
-    #     return self.NOT_PHISHING
-    #
