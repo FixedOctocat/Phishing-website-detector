@@ -39,7 +39,9 @@ def res_page():
         else:
             error = 'Invalid url'
 
-    return render_template('result.html', error=error)
+        return render_template('result.html', error=error)
+    elif request.method == 'GET':
+        return render_template('result.html')
 
 
 if __name__ == "__main__":
