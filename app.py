@@ -12,23 +12,7 @@ app.register_blueprint(api, url_prefix='/api')
 def main_page():
     # Function of UI main page route
 
-    if request.method == 'POST':
-        url = request.form.get('url')
-        
-        if url != '':
-            check = urlparse(url)
-
-            if check.scheme != '' and check.netloc != '':
-                ping_status = ping(url)
-
-                if not ping_status:
-                    error = 'Host down'
-            else:
-                error = 'Invalid url'
-        else:
-            error = 'Invalid url'
-
-    return render_template('main_page.html', error=error)
+    return render_template('main_page.html')
 
 @app.route("/res", methods=['GET', 'POST'], strict_slashes=False)
 def res_page():
