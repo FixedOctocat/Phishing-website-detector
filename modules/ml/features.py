@@ -126,7 +126,7 @@ class Features:
         return response, soup
 
     def _get_ip_blacklist(self):
-        with open('data/cleantalk_30d.ipset', 'r') as blacklist:
+        with open('modules/ml/data/cleantalk_30d.ipset', 'r') as blacklist:
             return blacklist.read()
 
     def _check_url_is_ip(self):

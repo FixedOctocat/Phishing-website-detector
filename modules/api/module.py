@@ -4,7 +4,8 @@ from datetime import datetime
 from urllib.parse import urlparse
 from flask import Blueprint, request
 from modules.api.helpful_functions import *
-from modules.ml.model import predict
+from modules.ml.model import predict, build_features
+from modules.ml.features import Features
 
 
 api = Blueprint('api', __name__)

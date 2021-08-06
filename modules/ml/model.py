@@ -8,12 +8,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from xgboost import XGBClassifier
 
-from features import Features
+from modules.ml.features import Features
 
 
 def train():
 
-    data0 = pd.read_csv('data/fishing_dataset.csv')
+    data0 = pd.read_csv('modules/ml/data/fishing_dataset.csv')
 
     print(data0.head())
     print(data0.columns)

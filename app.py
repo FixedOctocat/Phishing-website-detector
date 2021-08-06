@@ -2,6 +2,7 @@ from datetime import datetime
 from urllib.parse import urlparse
 from modules.api.module import api
 from modules.ml.model import predict, build_features
+from modules.ml.features import Features
 from modules.api.helpful_functions import ping
 from flask import Flask, render_template, request
 
@@ -34,8 +35,8 @@ def res_page():
                 if ping_status:
                     features = build_features(url)
 
-                    detailed = predict(url, features)
-                    detailed = features.get_features()
+                    ans = predict(url, features)
+                    features = features.get_features()
                     checks = """["URL contains IP"
                                 "URL's length check"
                                 "Is shortning present"
@@ -67,12 +68,12 @@ def res_page():
                                 "Are there any links leading to a website"
                                 "Is host is on Top Phishing IP's rank or not"]""".split('\n')
 
-                    if detailed == Features.PHISHING:
+                    if ans == Features.PHISHING:
                         status = 'phishing'
-                    elif detailed == Features.NOT_PHISHING:
+                    else:
                         status = 'not_phishing'
 
-                    return render_template('result.html', status=ans, checks=checks, detailed=detailed)
+                    return render_template('result.html', status=status, checks=checks, detailed=features)
                 else:
                     error = 'Host down'
 
