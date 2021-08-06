@@ -309,7 +309,9 @@ def route_check_sub_domain():
 
 @api.route('/check_https', methods=['POST'], strict_slashes=False)
 def route_check_https():
-    # API function which allows you to check if this URL redirects from http to https
+    # API function which allows
+    # you to check if this URL
+    # redirects from http to https
 
     if request.method == 'POST':
         url = request.form.get('url')
@@ -327,7 +329,8 @@ def route_check_https():
 
 @api.route('/check_url_length', methods=['POST'], strict_slashes=False)
 def route_check_url_length():
-    # API function which allows you to check the length of an URL
+    # API function which allows
+    # you to check the length of an URL
 
     if request.method == 'POST':
         url = request.form.get('url')

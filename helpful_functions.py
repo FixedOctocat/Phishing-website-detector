@@ -189,7 +189,8 @@ def check_sub_domain(url):
         return False
 
 def check_url_length(url):
-    # This function allows you to check the length of an URL
+    # This function allows you
+    # to check the length of an URL
 
     url = urlparse(url).netloc
 
@@ -199,7 +200,9 @@ def check_url_length(url):
         return False
 
 def check_https(url):
-    # This function allows you to check if URL redirects you from http to https
+    # This function allows you to
+    # check if URL redirects you
+    # from http to https
 
     res = []
 
