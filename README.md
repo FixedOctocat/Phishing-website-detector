@@ -48,7 +48,7 @@ python3 app.py
 Now we have only one page  
 And all output response we can see only on server  
   
-![Site UI](img/site_ui_1.png)
+![Site UI](САЙТ.PNG)
 
 ### API
 In API you can access next functions:  
