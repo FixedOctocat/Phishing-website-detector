@@ -36,9 +36,9 @@
         </div>
 
         {% if status == "not_phishing" %}
-        <div class="alert alert-success" style="font-size: 20px; margin-top: 10px; text-align: center">"Safe website"</div>
+        <div class="alert alert-success" style="font-size: 20px; margin-top: 50px; text-align: center">Safe website</div>
         {% elif status == "phishing" %}
-        <div class="alert alert-danger" style="font-size: 20px; margin-top: 10px; text-align: center">"Phishing website"</div>
+        <div class="alert alert-danger" style="font-size: 20px; margin-top: 50px; text-align: center">Phishing website</div>
         {% endif %}
 
 
@@ -51,21 +51,21 @@
         <table class="table" style="margin-top: 50px">
             <thead>
                 <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Parameter</th>
+                    <th scope="col" style="font-size: 25px">#</th>
+                    <th scope="col" style="font-size: 25px">Parameter</th>
                 </tr>
             </thead>
         <tbody>
         {% if detailed %}
         {% for n in range(25) %} <!-- 1 - red, -1 - green, 0 - yellow-->
             <tr>
-                <td>{{ n+1 }}</td>
+                <td style="font-size: 20px">{{ n+1 }}</td>
                 {% if detailed[n] == 1 %}
-                    <td class="table-danger">{{ checks[n] }}</td>
+                    <td class="table-danger" style="font-size: 20px">{{ checks[n] }}</td>
                 {% elif detailed[n] == -1 %}
-                    <td class="table-success">{{ checks[n] }}</td>
+                    <td class="table-success" style="font-size: 20px">{{ checks[n] }}</td>
                 {% elif detailed[n] == 0 %}
-                    <td class="table-warning">{{ checks[n] }}</td>
+                    <td class="table-warning" style="font-size: 20px">{{ checks[n] }}</td>
             {% endif %}
             </tr>
         {% endfor %}
