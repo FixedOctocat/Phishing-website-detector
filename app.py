@@ -72,7 +72,7 @@ def res_page():
                     elif predict_ans == Features.NOT_PHISHING:
                         status = 'not_phishing'
 
-                    return render_template('result.html', status=ans, checks=checks, detailed=predict_ans)
+                    return render_template('result.html', status=ans, checks=checks, detailed=detailed)
                 else:
                     error = 'Host down'
 
