@@ -1,7 +1,7 @@
 from datetime import datetime
 from urllib.parse import urlparse
 from modules.api.module import api
-from modules.ml.model import predict
+#from modules.ml.model import predict
 from flask import Flask, render_template, request
 
 

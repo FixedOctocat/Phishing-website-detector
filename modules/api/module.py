@@ -4,14 +4,16 @@ from datetime import datetime
 from modules.api.helpful_functions import *
 from urllib.parse import urlparse
 from flask import Blueprint, request
-from modules.ml.model import predict
+#from modules.ml.model import predict
 
 
 api = Blueprint('api', __name__)
 
 @api.route('/check_url', methods=['POST'], strict_slashes=False)
 def route_check_url():
-    pass
+    url = request.form.get('url')
+
+    return url
 
 @api.route('/check_cert', methods=['POST'], strict_slashes=False)
 def route_check_cert():
