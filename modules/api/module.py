@@ -11,9 +11,12 @@ api = Blueprint('api', __name__)
 
 @api.route('/check_url', methods=['POST'], strict_slashes=False)
 def route_check_url():
-    url = request.form.get('url')
-
-    return url
+    try:
+        url = request.form.to_dict(flat=False)['url'][0]
+    except:
+        return {'error': 'specify url'}
+    print(url)
+    return {'url': url}
 
 @api.route('/check_cert', methods=['POST'], strict_slashes=False)
 def route_check_cert():
@@ -21,7 +24,11 @@ def route_check_cert():
     # checks URL for certificate
 
     if request.method == 'POST':
-        url = request.form.get('url')
+        try:
+            url = request.form.to_dict(flat=False)['url'][0]
+        except:
+            return {'error': 'specify url'}
+        
         check = urlparse(url)
         if not (check.scheme != '' and check.netloc != ''):
             return {'error': 'invalid url'}
@@ -42,7 +49,11 @@ def route_check_indexing():
     # is indexed by Google
 
     if request.method == 'POST':
-        url = request.form.get('url')
+        try:
+            url = request.form.to_dict(flat=False)['url'][0]
+        except:
+            return {'error': 'specify url'}
+
         check = urlparse(url)
         if not (check.scheme != '' and check.netloc != ''):
             return {'error': 'invalid url'}
@@ -60,7 +71,11 @@ def route_check_redirecting():
     # looks for redirect's route
 
     if request.method == 'POST':
-        url = request.form.get('url')
+        try:
+            url = request.form.to_dict(flat=False)['url'][0]
+        except:
+            return {'error': 'specify url'}
+
         check = urlparse(url)
         if not (check.scheme != '' and check.netloc != ''):
             return {'error': 'invalid url'}
@@ -78,7 +93,11 @@ def route_check_favicon():
     # ckecks presents of favicon.ico
 
     if request.method == 'POST':
-        url = request.form.get('url')
+        try:
+            url = request.form.to_dict(flat=False)['url'][0]
+        except:
+            return {'error': 'specify url'}
+
         check = urlparse(url)
         if not (check.scheme != '' and check.netloc != ''):
             return {'error': 'invalid url'}
@@ -96,7 +115,11 @@ def route_whois():
     # you to find out registration date
 
     if request.method == 'POST':
-        ip = request.form.get('ip')
+        try:
+            ip = request.form.to_dict(flat=False)['ip'][0]
+        except:
+            return {'error': 'specify ip'}
+
         try:
             check = IP(ip)
             ans = whois(ip)
@@ -111,7 +134,11 @@ def route_get_ip_from_url():
     # you to get IP from URL
 
     if request.method == 'POST':
-        url = request.form.get('url')
+        try:
+            url = request.form.to_dict(flat=False)['url'][0]
+        except:
+            return {'error': 'specify url'}
+
         check = urlparse(url)
         if not (check.scheme != '' and check.netloc != ''):
             return {'error': 'invalid url'}
@@ -127,7 +154,11 @@ def route_check_leet():
     # contains leet alphabet
 
     if request.method == 'POST':
-        url = request.form.get('url')
+        try:
+            url = request.form.to_dict(flat=False)['url'][0]
+        except:
+            return {'error': 'specify url'}
+
         check = urlparse(url)
 
         if not (check.scheme != '' and check.netloc != ''):
@@ -146,7 +177,11 @@ def route_check_urloip():
     # if the string is URL or IP
 
     if request.method == 'POST':
-        url = request.form.get('url')
+        try:
+            url = request.form.to_dict(flat=False)['url'][0]
+        except:
+            return {'error': 'specify url'}
+
         check = urlparse(url)
 
         if not (check.scheme != '' and check.netloc != ''):
@@ -165,7 +200,11 @@ def route_check_at_symbol():
     # to find At symbol at URL
 
     if request.method == 'POST':
-        url = request.form.get('url')
+        try:
+            url = request.form.to_dict(flat=False)['url'][0]
+        except:
+            return {'error': 'specify url'}
+
         check = urlparse(url)
 
         if not (check.scheme != '' and check.netloc != ''):
@@ -184,7 +223,11 @@ def route_check_sub_domain():
     # find out if URL contains subdomain
 
     if request.method == 'POST':
-        url = request.form.get('url')
+        try:
+            url = request.form.to_dict(flat=False)['url'][0]
+        except:
+            return {'error': 'specify url'}
+
         check = urlparse(url)
 
         if not (check.scheme != '' and check.netloc != ''):
@@ -204,7 +247,11 @@ def route_check_https():
     # redirects from http to https
 
     if request.method == 'POST':
-        url = request.form.get('url')
+        try:
+            url = request.form.to_dict(flat=False)['url'][0]
+        except:
+            return {'error': 'specify url'}
+
         check = urlparse(url)
 
         if not (check.scheme != '' and check.netloc != ''):
@@ -223,7 +270,11 @@ def route_check_url_length():
     # you to check the length of an URL
 
     if request.method == 'POST':
-        url = request.form.get('url')
+        try:
+            url = request.form.to_dict(flat=False)['url'][0]
+        except:
+            return {'error': 'specify url'}
+        
         check = urlparse(url)
 
         if not (check.scheme != '' and check.netloc != ''):
