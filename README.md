@@ -83,7 +83,7 @@ In API you can access next functions:
 >	 ```{'check_redirecting': 'ok'}``` - service checked and is being indexed by Google  
 >	 ```{{'ans': 'error'}, {'redirects': {{ redirects }} }}``` - service checked and isn't being indexed by Google  
   
-#### Check presense of favicon.ico
+#### Check presence of favicon.ico
 > **path:** /api/check_favicon  
 > In POST request you should specify URL  
 > Response answers:  
