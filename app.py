@@ -131,9 +131,9 @@ def main_page():
 @app.route("/res", methods=['GET', 'POST'], strict_slashes=False)
 def result_page():
     if request.method == "GET":
-        return render_template('search.html')
+        return render_template('result.html')
 
-    return render_template('search.html')
+    return render_template('result.html')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80)
