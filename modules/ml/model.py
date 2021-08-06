@@ -7,6 +7,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from xgboost import XGBClassifier
 
+from features import Features
+
 
 def train():
 
@@ -31,10 +33,6 @@ def train():
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 12)
 
-    ML_Model = []
-    acc_train = []
-    acc_test = []
-
     xgb = XGBClassifier(learning_rate=0.8, max_depth=17)
     xgb.fit(X_train, y_train)
     xgb.save_model("xgb.model")
@@ -57,7 +55,7 @@ def predict(url):
     xgb.load_model('xgb.model')
 
     X_input = url
-    X_new = feature_extract.featureExtraction(X_input)
+    X_new = Features(X_input).get_features()
     X_new = np.array(X_new).reshape(1, -1)
 
     prediction = xgb.predict(X_new)
@@ -65,3 +63,6 @@ def predict(url):
         print("Phish")
     else:
         print("Not phish")
+
+
+predict("https://google.com")
