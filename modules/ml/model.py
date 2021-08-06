@@ -50,9 +50,16 @@ def train():
     print("XGBoost : Accuracy on test Data: {:.3f}".format(acc_test_xgb))
 
 
-def predict(url):
-    X_input = url
-    X_new = Features(X_input).get_features()
+def build_features(url):
+    return Features(url)
+
+
+def predict(url, features=None):
+
+    if features:
+        X_new = features.get_features()
+    else:
+        X_new = build_features(url).get_features()
 
     if not os.path.exists('xgb.model'):
         train()
