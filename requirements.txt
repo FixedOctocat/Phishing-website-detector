@@ -11,3 +11,4 @@ lxml
 matplotlib
 seaborn
 xgboost
+googlesearch-python

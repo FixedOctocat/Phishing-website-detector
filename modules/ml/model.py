@@ -50,16 +50,18 @@ def train():
 
 
 def predict(url):
-    # instantiate the model
+    X_input = url
+    X_new = Features(X_input).get_features()
+    print(X_new)
+    # exit()
+
     xgb = XGBClassifier(learning_rate=0.4, max_depth=7)
     xgb.load_model('xgb.model')
 
-    X_input = url
-    X_new = Features(X_input).get_features()
     X_new = np.array(X_new).reshape(1, -1)
 
     prediction = xgb.predict(X_new)
-    if prediction == -1:
+    if prediction == Features.PHISHING:
         print("Phish")
     else:
         print("Not phish")
