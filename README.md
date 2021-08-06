@@ -53,14 +53,6 @@ And all output response we can see only on server
 ### API
 In API you can access next functions:  
   
-#### Check URL on all functions  
-> **path:** /api/check_url  
-> In POST request you should specify URL  
-> Response answers:  
->	 ```{'error': 'invalid url'}```  - URL incorrect  
->	 ```{'ping': 'host down'}```  - host seems down  
->	 ```{"ping": "Host up", "Created": {{ date }}, ..., "final_score": "7/10"}```  - service checked; in response you get all functions answers and final score of service  
-  
 #### Checking certificate
 > **path:** /api/check_cert  
 > In POST request you should specify URL  
