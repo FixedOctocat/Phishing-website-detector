@@ -135,7 +135,7 @@ def predict(url, features=None):
     return xgb.predict(X_new)
 
 
-train2()
+# train2()
 # url = 'https://testnacovid-gosuslugi.ru/'
 # url = 'https://yandex.ru/'
 # f = build_features(url)
