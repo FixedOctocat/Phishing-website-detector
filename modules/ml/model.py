@@ -28,21 +28,28 @@ def train():
     data = data0.drop(['id'], axis = 1).copy()
     data = data.sample(frac=1).reset_index(drop=True)
 
-    # Sepratating & assigning features and target columns to X & y
+    # Separating & assigning features and target columns to X & y
     y = data['Result']
-    X = data.drop('Result', axis=1)
+    data = data.drop('Result', axis=1)
+
+    # Drop unavailable features
+    data = data.drop('URL_of_Anchor', axis=1)
+    data = data.drop('Links_in_tags', axis=1)
+    data = data.drop('SFH', axis=1)
+    data = data.drop('Request_URL', axis=1)
+    X = data.drop('Abnormal_URL', axis=1)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 12)
 
-    xgb = XGBClassifier(learning_rate=0.8, max_depth=17)
+    xgb = XGBClassifier(learning_rate=0.2, max_depth=40)
     xgb.fit(X_train, y_train)
     xgb.save_model("xgb.model")
 
-    #predicting the target value from the model for the samples
+    # Predicting the target value from the model for the samples
     y_test_xgb = xgb.predict(X_test)
     y_train_xgb = xgb.predict(X_train)
 
-    #computing the accuracy of the model performance
+    # Computing the accuracy of the model performance
     acc_train_xgb = accuracy_score(y_train, y_train_xgb)
     acc_test_xgb = accuracy_score(y_test, y_test_xgb)
 
@@ -64,9 +71,22 @@ def predict(url, features=None):
     if not os.path.exists('xgb.model'):
         train()
 
-    xgb = XGBClassifier(learning_rate=0.4, max_depth=7)
+    xgb = XGBClassifier(learning_rate=0.5, max_depth=40)
     xgb.load_model('xgb.model')
 
     X_new = np.array(X_new).reshape(1, -1)
 
     return xgb.predict(X_new)
+
+
+# train()
+# url = 'https://testnacovid-gosuslugi.ru/'
+# url = 'https://yandex.ru/'
+# f = build_features(url)
+# p = predict(url, f)
+# print(p)
+# if p == Features.PHISHING:
+#     print('Phishing')
+# else:
+#     print('Not phishing')
+# print(f.get_features(True))

@@ -32,8 +32,42 @@ class Features:
         self.global_rank = self._get_global_rank()
         self.ip_blacklist = self._get_ip_blacklist()
 
-    def get_features(self):
-        features = [
+    def get_features(self, with_labels=False):
+        if with_labels:
+            return {
+                'ip': self._check_url_is_ip(),
+                'url len': self._check_url_length(),
+                'shorting': self._check_shortning(),
+                'at symbol': self._check_at_symbol(),
+                'double slashing': self._check_double_slashing(),
+                'prerfix suffix': self._check_prefix_suffix(),
+                'subdomain': self._check_sub_domain(),
+                'ssl': self._check_ssl(),
+                'reg_len': self._check_reg_len(),
+                'favicon': self._check_favicon(),
+                'port': self._check_port(),
+                'https': self._check_https_token(),
+                'internal links': self._check_internal_links(),
+                'url anchr': self._check_url_of_anchor(),
+                'links in tags': self._checks_links_in_tags(),
+                'sfh': self._check_sfh(),
+                'mailing': self._check_for_mailing(),
+                'abnormal': self._check_abnormal_url(),
+                'forwading': self._check_website_forwarding(),
+                'status bar': self._check_status_bar_customization(),
+                'disable_right': self._check_disable_right_click(),
+                'popup': self._check_popup_window(),
+                'iframe': self._check_iframe_redirection(),
+                'domain age': self._check_domain_age(),
+                'dns_record': self._check_dns_record(),
+                'traffic': self._check_website_traffic(),
+                'pagerank': self._check_pagerank(),
+                'index': self._check_google_index(),
+                'links': self._check_links_to_page(),
+                'stat report': self._check_statistical_report(),
+            }
+
+        return [
             self._check_url_is_ip(),
             self._check_url_length(),
             self._check_shortning(),
@@ -46,12 +80,12 @@ class Features:
             self._check_favicon(),
             self._check_port(),
             self._check_https_token(),
-            self._check_internal_links(),
-            self._check_url_of_anchor(),
-            self._checks_links_in_tags(),
-            self._check_sfh(),
+            # self._check_internal_links(),
+            # self._check_url_of_anchor(),
+            # self._checks_links_in_tags(),
+            # self._check_sfh(),
             self._check_for_mailing(),
-            self._check_abnormal_url(),
+            # self._check_abnormal_url(),
             self._check_website_forwarding(),
             self._check_status_bar_customization(),
             self._check_disable_right_click(),
@@ -65,7 +99,6 @@ class Features:
             self._check_links_to_page(),
             self._check_statistical_report(),
         ]
-        return features
 
     def _get_domain(self):
         domain = re.findall(r"://([^/]+)/?", self.url)[0]
@@ -148,7 +181,10 @@ class Features:
         return self.PHISHING if expire_in.days / 365 <= 365 else self.NOT_PHISHING
 
     def _check_favicon(self):
-        return self.NOT_PHISHING if requests.get(f"{self.url}/favicon.ico").content else self.PHISHING
+        try:
+            return self.NOT_PHISHING if requests.get(f"{self.url}/favicon.ico").content else self.PHISHING
+        except:
+            return self.PHISHING
 
     def _check_port(self):
         allowed_ports = ['80', '8080']
@@ -163,9 +199,9 @@ class Features:
         return self.PHISHING if re.findall(r"^https://", self.domain) or re.findall(r"^http://", self.domain) \
             else self.NOT_PHISHING
 
-    # TODO
     def _check_internal_links(self):
-        return self.NOT_PHISHING
+        # Fuck
+        return self.PHISHING
 
     def _check_url_of_anchor(self):
         return self.NOT_PHISHING
@@ -174,7 +210,8 @@ class Features:
         return self.NOT_PHISHING
 
     def _check_sfh(self):
-        return self.NOT_PHISHING
+        # Fuck
+        return self.PHISHING
 
     def _check_for_mailing(self):
         if not self.url_response.content:
@@ -183,7 +220,8 @@ class Features:
         return self.PHISHING if re.findall(r"[mail\(\)|mailto:?]", self.url_response_bs.text) else self.NOT_PHISHING
 
     def _check_abnormal_url(self):
-        return self.NOT_PHISHING
+        # FUCK
+        return self.PHISHING
 
     def _check_website_forwarding(self):
         if not self.url_response_bs:
@@ -248,12 +286,18 @@ class Features:
         return self.PHISHING if self.global_rank < 0.2 else self.NOT_PHISHING
 
     def _check_google_index(self):
-        site = search(f'{self.url}', 10)
-        return self.NOT_PHISHING if len(site) > self.THRESHOLDS['google_index'] else self.PHISHING
+        try:
+            site = search(f'{self.url}', 10)
+            return self.NOT_PHISHING if len(site) > self.THRESHOLDS['google_index'] else self.PHISHING
+        except:
+            return self.NOT_PHISHING
 
     def _check_links_to_page(self):
-        site = search(f'href="{self.url}"', 10)
-        return self.NOT_PHISHING if len(site) > self.THRESHOLDS['external_links'] else self.PHISHING
+        try:
+            site = search(f'href="{self.url}"', 10)
+            return self.NOT_PHISHING if len(site) > self.THRESHOLDS['external_links'] else self.PHISHING
+        except:
+            return self.NOT_PHISHING
 
     def _check_statistical_report(self):
         try:
