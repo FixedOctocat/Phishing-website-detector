@@ -4,7 +4,7 @@ from datetime import datetime
 from urllib.parse import urlparse
 from flask import Blueprint, request
 from modules.api.helpful_functions import *
-#from modules.ml.model import predict
+from modules.ml.model import predict
 
 
 api = Blueprint('api', __name__)
@@ -15,8 +15,15 @@ def route_check_url():
         url = request.form.to_dict(flat=False)['url'][0]
     except:
         return {'error': 'specify url'}
-    print(url)
-    return {'url': url}
+    
+    features = build_features(url)
+    detailed = predict(url, features)
+
+    if detailed == Features.PHISHING:
+        return {'status': -1}
+    elif detailed == Features.NOT_PHISHING:
+        return {'status': 1}
+
 
 @api.route('/check_cert', methods=['POST'], strict_slashes=False)
 def route_check_cert():
