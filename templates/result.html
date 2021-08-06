@@ -18,14 +18,29 @@
             <input type="text" class="form-control" name="url" aria-label="Text input with dropdown button">
             <button class="btn btn-outline-warning dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Dropdown</button>
               <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="#">Action</a></li>
-                <li><a class="dropdown-item" href="#">Another action</a></li>
-                <li><a class="dropdown-item" href="#">Something else here</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#">Separated link</a></li>
+                <li><a class="dropdown-item" href="#">Check by ML</a></li>
+                <li><a class="dropdown-item" href="#">Checking certificate</a></li>
+                <li><a class="dropdown-item" href="#">CHeck indexing by Google</a></li>
+                <li><a class="dropdown-item" href="#">Check redirects</a></li>
+                <li><a class="dropdown-item" href="#">Check presence of favicon.ico</a></li>
+                <li><a class="dropdown-item" href="#">Get creation time</a></li>
+               <li><a class="dropdown-item" href="#">Get IP from URL</a></li>
+               <li><a class="dropdown-item" href="#">Check URL on leet text</a></li>
+               <li><a class="dropdown-item" href="#">CHeck if URL contains IP</a></li>
+               <li><a class="dropdown-item" href="#">Check if URL contains @ (At symbol)</a></li>
+               <li><a class="dropdown-item" href="#">Check if URL contains subdomain</a></li>
+               <li><a class="dropdown-item" href="#">Check if site redirects to https from http</a></li>
+               <li><a class="dropdown-item" href="#">Check site URL length</a></li>
               </ul>
             <button type="submit" class="btn btn-warning" style="width: 100px">Go</button>
         </div>
+
+        {% if status == "not_phishing" %}
+        <div class="alert alert-success" style="font-size: 20px; margin-top: 10px; text-align: center">"Safe website"</div>
+        {% elif status == "phishing" %}
+        <div class="alert alert-danger" style="font-size: 20px; margin-top: 10px; text-align: center">"Phishing website"</div>
+        {% endif %}
+
 
         {% if error %}
             <div class="alert alert-warning" role="alert">
@@ -38,16 +53,23 @@
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Parameter</th>
-                    <th scope="col">Status</th>
                 </tr>
             </thead>
         <tbody>
+
+        {% for n in range(25) %} <!-- 1 - red, -1 - green, 0 - yellow-->
             <tr>
-                <th scope="row">1</th>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td>{{ n+1 }}</td>
+                {% if detailed[n] == 1 %}
+                    <td class="table-danger">{{ checks[n] }}</td>
+                {% elif detailed[n] == -1 %}
+                    <td class="table-success">{{ checks[n] }}</td>
+                {% elif detailed[n] == 0 %}
+                    <td class="table-warning">{{ checks[n] }}</td>
+            {% endif %}
             </tr>
+        {% endfor %}
+
         </tbody>
         </table>
     </div>
