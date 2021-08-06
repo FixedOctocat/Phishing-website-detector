@@ -2,6 +2,7 @@ from datetime import datetime
 from urllib.parse import urlparse
 from modules.api.module import api
 #from modules.ml.model import predict
+from modules.api.helpful_functions import ping
 from flask import Flask, render_template, request
 
 
@@ -19,7 +20,10 @@ def res_page():
     # Function of UI result page route
 
     if request.method == 'POST':
-        url = request.form.get('url')
+        try:
+            url = request.form.to_dict(flat=False)['url'][0]
+        except:
+            return {'error': 'specify url'}
         
         if url != '':
             check = urlparse(url)
