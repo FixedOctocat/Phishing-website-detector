@@ -31,24 +31,18 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
   </head>
   <body>
+  <form method="POST" action="/res">
   <div class="text-center">
-    <p style="font-size: 50px; margin-top: 13%"><b style="font-size: 100px; color: #7ec0d8">P</b>hishing <b style="font-size: 100px; color: #d05e27">W</b>ebsite <b style="font-size: 100px; color: #3ba0c4">D</b>etector</p>
+    <p style="font-size: 50px; margin-top: 8%"><b style="font-size: 100px; color: #7ec0d8">P</b>hishing <b style="font-size: 100px; color: #d05e27">W</b>ebsite <b style="font-size: 100px; color: #3ba0c4">D</b>etector</p>
   </div>
-    <div class="input-group" style="width: 70%; margin-left: 15%; margin-top: 3%">
+    <div id="input" class="input-group" style="width: 70%; margin-left: 15%; margin-top: 3%">
   <input type="text" class="form-control" aria-label="Text input with dropdown button">
-  <button class="btn btn-outline-warning dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Dropdown</button>
-  <ul class="dropdown-menu dropdown-menu-end">
-    <li><a class="dropdown-item" href="#">Action</a></li>
-    <li><a class="dropdown-item" href="#">Another action</a></li>
-    <li><a class="dropdown-item" href="#">Something else here</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><a class="dropdown-item" href="#">Separated link</a></li>
-  </ul>
-      <button type="button" class="btn btn-warning" style="width: 100px">Go</button>
+      <button id="button_go" type="submit" class="btn btn-warning" style="width: 100px">Go</button>
 </div>
     <div class="container-fluid">
     <img src="static/images/giphy.gif" class="rounded mx-auto d-block"; style="width: 25%; height: 25%; margin-top: 50px" alt="Рыбка">
     </div>
+  </form>
   </body>
 </html>
 
