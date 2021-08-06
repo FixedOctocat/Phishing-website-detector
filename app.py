@@ -1,8 +1,9 @@
 from datetime import datetime
-from modules.api_module import api
-from urllib.parse import urlparse
-from flask import Flask, render_template, request
 from helpful_functions import *
+from urllib.parse import urlparse
+from modules.api_module import api
+from modules.ml.module import predict
+from flask import Flask, render_template, request
 
 
 app = Flask(__name__, static_folder='static')
