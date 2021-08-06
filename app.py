@@ -67,9 +67,9 @@ def res_page():
                                 "Are there any links leading to a website"
                                 "Is host is on Top Phishing IP's rank or not"]""".split('\n')
 
-                    if predict_ans == Features.PHISHING:
+                    if detailed == Features.PHISHING:
                         status = 'phishing'
-                    elif predict_ans == Features.NOT_PHISHING:
+                    elif detailed == Features.NOT_PHISHING:
                         status = 'not_phishing'
 
                     return render_template('result.html', status=ans, checks=checks, detailed=detailed)
