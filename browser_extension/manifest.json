@@ -1,0 +1,22 @@
+{
+	"manifest_version": 3,
+	"name": "PWD Plugin",
+	"version": "1.0.0",
+
+	"action": {
+    "default_icon": "static/img/icon.png",
+    "default_popup": "popup.html"
+  },
+
+  "permissions": [
+    "activeTab",
+    "webRequest",
+    "tabs"
+  ],
+  "host_permissions": [
+  	"*://*.google.com/",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "content_security_policy": {"script-src": "self", "unsafe-eval": true, "object-src": "self", "unsafe-inline": true}
+}
